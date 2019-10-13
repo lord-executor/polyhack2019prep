@@ -1,0 +1,8 @@
+version: "2"
+services:
+  ros-vnc-ubuntu:
+    image: henry2423/ros-vnc-ubuntu:melodic
+    ports:
+      - "5901:5901"
+      - "6901:6901"
+
