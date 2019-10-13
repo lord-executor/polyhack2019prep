@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  base:
+    image: ros:melodic-ros-base
+    environment:
+      - ROS_MASTER_URI=http://master:11311
+    networks:
+      dockroscore_rosnet: {}
+    command: rosnode list
+networks:
+  dockroscore_rosnet:
+    external: true
