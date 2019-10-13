@@ -1,0 +1,12 @@
+version: "3.5"
+services:
+  master:
+    image: ros:melodic-ros-base
+    command: roscore
+    networks:
+      rosnet:
+        aliases:
+          - master
+networks:
+  rosnet:
+    driver: bridge
