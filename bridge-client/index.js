@@ -2,6 +2,15 @@
 // -----------------
 
 import { data } from './data.js';
+import {
+    Vector,
+    Map,
+} from './geometry.js';
+import {
+    MapRenderer,
+    PointCloud,
+    Robot,
+} from './drawing.js';
 
 // var ros = new ROSLIB.Ros({
 //     url : 'ws://elcaduck2.local:9001'
@@ -38,15 +47,11 @@ const listener = rxjs.interval(2000).pipe(
 );
 
 const position = { x: 1.5, y: 1.5 }
-const mapSize = 30;
-const map = [];
-for (let r = 0; r < mapSize; r++) {
-    const row = [];
-    for (let c = 0; c < mapSize; c++) {
-        row.push(0);
-    }
-    map.push(row);
-}
+const mapSize = 20;
+const map = new Map(mapSize, mapSize, 0);
+const robotOffset = new Vector(400, 400);
+const cloud = new PointCloud('red', x => x.add(robotOffset));
+const robot = new Robot(new Vector(0, 0), x => x.add(robotOffset));
 
 const canvas = document.getElementById('canvas');
 canvas.width = 1920;
@@ -57,25 +62,12 @@ window.ctx = ctx;
 function drawMap(ctx, map) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     const l = 800 / mapSize;
-    ctx.fillStyle = 'green';
+    const hue = 120;
+    ctx.fillStyle = 'hsl(' + hue + ', 100%, 75%)';
 
-    for (let r = 0; r < mapSize; r++) {
-        for (let c = 0; c < mapSize; c++) {
-            const value = map[r][c];
-            ctx.fillRect(c * l + 1, r * l + 1, l -2, l - 2);
-        }
-    }
-}
-
-function drawRobot(ctx, pos) {
-    const p = { x: 400, y: 400 };
-
-    ctx.fillStyle = 'blue';
-    ctx.beginPath();
-    ctx.moveTo(p.x, p.y - 10);
-    ctx.lineTo(p.x - 7, p.y + 10);
-    ctx.lineTo(p.x + 7, p.y + 10);
-    ctx.fill();
+    map.each((v, x, y) => {
+        ctx.fillRect(x * l + 1, y * l + 1, l -2, l - 2);
+    });
 }
 
 function drawPoints(ctx, points) {
@@ -90,18 +82,14 @@ listener.pipe(rxjs.operators.take(2)).subscribe((message) => {
     drawMap(ctx, map);
 
     const points = message.ranges.map((r, i) => {
-        const p = { x: 400, y: 400 };
         const phi = i * message.angle_increment;
-
-        p.x = p.x + Math.cos(phi) * r * 50;
-        p.y = p.y + Math.sin(phi) * r * 50;
-
-        return p;
+        return Vector.fromAngle(phi, 50 * r);
     });
-    points.push({ x: 400, y: 400 });
 
-    drawPoints(ctx, points);
-    drawRobot(ctx, position);
+    cloud.render(ctx, points);
+    robot.render(ctx);
 }, null, () => {
     console.log(window.data);
 });
+
+window.v = Vector.fromAngle(0.2, 1);
