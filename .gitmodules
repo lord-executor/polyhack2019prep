@@ -1,0 +1,3 @@
+[submodule "lidar-test/packages/ydlidar_ros"]
+	path = lidar-test/packages/ydlidar_ros
+	url = https://github.com/YDLIDAR/ydlidar_ros.git
