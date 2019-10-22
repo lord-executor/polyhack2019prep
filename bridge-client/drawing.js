@@ -3,7 +3,24 @@ import { Vector } from "./geometry.js";
 const identityTransform = x => x;
 
 export class MapRenderer {
+    constructor(map, tileSize, transform) {
+        this.map = map;
+        this.tileSize = tileSize;
+        this.transform = transform;
+    }
 
+    render(ctx) {
+        this.map.each((v, x, y) => {
+            const hue = 120 - 120 * v;
+            ctx.fillStyle = 'hsl(' + hue + ', 100%, 75%)';
+            ctx.fillRect(
+                x * this.tileSize + 1,
+                y * this.tileSize + 1,
+                this.tileSize - 2,
+                this.tileSize - 2
+            );
+        });
+    }
 }
 
 export class PointCloud {
@@ -36,24 +53,23 @@ export class PointCloud {
 }
 
 export class Robot {
-    constructor(position, transform = identityTransform) {
-        this.position = position;
+    constructor(pose, transform = identityTransform) {
+        this.pose = pose;
         this.transform = transform;
     }
 
-    update(position) {
-        this.position = position;
-    }
-
     render(ctx) {
-        ctx.strokeStyle = 'black';
         ctx.fillStyle = 'blue';
 
-        const p = this.transform(this.position);
+        const p = this.transform(this.pose.position);
+        const p1 = p.add(new Vector(10, 0).rotate(-this.pose.orientation));
+        const p2 = p.add(new Vector(-10, -7).rotate(-this.pose.orientation));
+        const p3 = p.add(new Vector(-10, 7).rotate(-this.pose.orientation));
+        console.log(p, this.pose.orientation, p1);
         ctx.beginPath();
-        ctx.moveTo(p.x, p.y - 10);
-        ctx.lineTo(p.x - 7, p.y + 10);
-        ctx.lineTo(p.x + 7, p.y + 10);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.lineTo(p3.x, p3.y);
         ctx.fill();
     }
 }

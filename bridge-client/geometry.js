@@ -20,10 +20,33 @@ export class Vector {
     scale(factor) {
         return new Vector(factor * this.x, factor * this.y);
     }
+
+    rotate(phi) {
+        return new Vector(
+            this.x * Math.cos(phi) - this.y * Math.sin(phi),
+            this.x * Math.sin(phi) + this.y * Math.cos(phi)
+        );
+    }
+
+    invertX() {
+        return new Vector(-this.x, this.y);
+    }
+
+    invertY() {
+        return new Vector(this.x, -this.y);
+    }
 }
 
 Vector.fromAngle = (phi, magnitude) => {
     return new Vector(magnitude * Math.cos(phi), magnitude * Math.sin(phi));
+}
+
+
+export class Pose {
+    constructor(position, orientation) {
+        this.position = position;
+        this.orientation = orientation;
+    }
 }
 
 
